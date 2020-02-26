@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View, YellowBox,
+} from 'react-native';
 import { SplashScreen } from 'expo';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +11,9 @@ import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
 
 const Stack = createStackNavigator();
+
+// Don't yell at me about other modules' error messages
+YellowBox.ignoreWarnings(['RootErrorBoundary'])
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
