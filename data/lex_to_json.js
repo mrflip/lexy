@@ -9,6 +9,7 @@ const json_lexicon_fn = './wl_us.json'
 
 let flat_lexicon = fs.readFileSync(flat_lexicon_fn, { encoding: 'utf8'});
 let words = flat_lexicon.trim().split(/[\r\n]+/);
+words = words.map((wd) => wd.toLowerCase());
 
 // console.log(words.slice(0,3));
 
