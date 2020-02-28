@@ -1,12 +1,13 @@
-import * as React from 'react';
+import * as React     from 'react';
 import { StyleSheet, Text, View, FlatList,
-}                 from 'react-native';
+}                     from 'react-native';
 import { Button, Input, Icon,
-}                 from 'react-native-elements'
-import Layout     from '../constants/Layout'
-import DictSet    from '../lib/DictSet'
-import Guess      from '../lib/Guess'
-import Bee        from '../lib/Bee'
+}                     from 'react-native-elements'
+import { CommonActions } from '@react-navigation/native';
+//
+import Layout         from '../constants/Layout'
+import HeaderedScreen from '../components/HeaderedScreen'
+import Bee            from '../lib/Bee'
 
 
 const LetterButton = ({ letter, handler }) => (
@@ -20,10 +21,16 @@ const LetterButton = ({ letter, handler }) => (
 const initialLetters =  'MAOBLNR'
 
 class HomeScreen extends React.Component {
-  state = {
-    entry: '',
-    guesses: [],
-    bee:   new Bee(initialLetters),
+  constructor(props) {
+    super(props)
+    const { route, navigation  } = props
+    const { name, params={} } = route
+    this.state = {
+      entry: '',
+      guesses: [],
+      bee:   new Bee(params.letters||initialLetters),
+    }
+    console.log(this.state, 'nav', navigation, navigation.options, 'vals', props)
   }
 
   elements = {
@@ -87,25 +94,25 @@ class HomeScreen extends React.Component {
     )
   }
 
+  newNav = (navigation) => {
+    navigation.navigate('NEWBEE', { foo: 'bar', letters: 'C/AIHRLV' })
+  }
+
   render() {
     const { bee, entry, guesses } = this.state
     return (
-      <View style={styles.container}>
+      <HeaderedScreen title={bee.dispLtrs} style={styles.container}>
 
         <Input
           style={styles.lettersInput}
           value={bee.letters}
-          onChangeText={(text) => {
-            const newbee = new Bee(text)
-            this.setState({
-              bee: newbee,
-            })
-          }}
+          onChangeText={(text) => this.setState({ bee: new Bee(text) })}
         />
 
-        <Text>
-          {bee.dispLtrs}
-        </Text>
+        <Button
+        title="hi"
+          onPress={() => this.newNav(this.props.navigation)}
+        />
 
         <FlatList
           style={styles.wordList}
@@ -138,7 +145,7 @@ class HomeScreen extends React.Component {
         <View style={styles.buttonRow}>
           {
             bee.larry.map((ltr) => (
-              <LetterButton letter={ltr} handler={(ll) => this.addLetter(ll)} />))
+              <LetterButton key={ltr} letter={ltr} handler={(ll) => this.addLetter(ll)} />))
           }
         </View>
 
@@ -156,7 +163,7 @@ class HomeScreen extends React.Component {
           </Text>
         </View>
 
-      </View>
+      </HeaderedScreen>
     );
   }
 }
