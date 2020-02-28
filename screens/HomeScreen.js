@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View,
-         FlatList,
-} from 'react-native';
-import { Button, Input, Icon, ListItem
-}                     from 'react-native-elements'
-import FormInput      from '../components/FormInput'
-import Layout         from '../constants/Layout'
-import Dict from '../data/wl_us.json';
-const  DictSet = new Set();
-for (let wd of Dict) DictSet.add(wd);
+import { StyleSheet, Text, View, FlatList,
+}                 from 'react-native';
+import { Button, Input, Icon,
+}                 from 'react-native-elements'
+import Layout     from '../constants/Layout'
+import DictSet    from '../lib/DictSet'
+import Guess      from '../lib/Guess'
+import Bee        from '../lib/Bee'
 
-const LetterButton = ({letter, handler}) => (
+
+const LetterButton = ({ letter, handler }) => (
   <Button
     title={letter}
     onPress={() => handler(letter)}
@@ -18,90 +17,145 @@ const LetterButton = ({letter, handler}) => (
   />
 )
 
+const initialLetters =  'MAOBLNR'
+
 class HomeScreen extends React.Component {
   state = {
-    letters: 'MAOBLNR',
     entry: '',
-    words: [],
-    valid: false
+    guesses: [],
+    bee:   new Bee(initialLetters),
   }
 
   elements = {
   }
 
-  addLetter(letter, ...rest) {
-    console.log('hi', this.state, letter, rest)
-    const newVal = this.state.entry + letter
-    this.setState(({ entry, valid }) => ({
-      entry: newVal,
-      valid: DictSet.has(newVal),
+  addLetter(letter) {
+    this.setState(({ entry }) => ({
+      entry: (entry + letter),
     }))
   }
 
-  clearEntry = () => this.setState(({ entry }) => ({ entry: '' }))
+  delLetter = () => {
+    this.setState(({ entry }) => {
+      const newVal = entry.substring(0, entry.length - 1)
+      return ({
+        entry: newVal,
+      })
+    })
+  }
 
-  addEntry = () => {
-    this.setState(({ entry, words }) => {
-      words.push(entry)
-      return({
-        words,
+  clearEntry = () => this.setState(() => ({ entry: '' }))
+
+  addGuess = () => {
+    this.setState(({ entry, bee }) => {
+      if (bee.hasWord(entry)) return ({ entry: '' })
+      bee.addGuess(entry)
+      return ({
+        guesses: bee.guesses,
         entry: '',
       })
     })
   }
 
-  wordListItem = ({item}) => {
-    console.log(item);
-    // return( <ListItem title={item}/> )
-    return(
-      <Text
-        style={styles.wordListItem}
-      >
-        {item}
-      </Text>
+  delEntry = (word) => {
+    this.setState(({ bee }) => {
+      bee.delGuess(word)
+      return ({ guesses: bee.guesses })
+    })
+  }
+
+  validStyle = (guess) => {
+    if (!guess.valid) return styles.entryBad
+    if (guess.isPan)   return styles.entryPangram
+    return styles.entryValid
+  }
+
+  wordListItem = ({ item }) => {
+    const guess = item
+    return (
+      <View style={styles.wordListItemBox}>
+        <Text style={styles.wordListInfo}>{guess.score}</Text>
+        <Text style={[styles.wordListItem, this.validStyle(guess)]}>
+          {guess.word}
+        </Text>
+        <Icon
+          name="cancel"
+          style={styles.clearEntry}
+          onPress={() => this.delEntry(guess.word)}
+        />
+      </View>
     )
   }
-  
+
   render() {
-    const { letters, entry, words, valid } = this.state
+    const { bee, entry, guesses } = this.state
     return (
       <View style={styles.container}>
-        <FlatList style={styles.wordList}
-                  keyExtractor={(word, idx) => (idx.toString())}
-                  data={words}
-                  renderItem={this.wordListItem}
-        />
+
         <Input
           style={styles.lettersInput}
-          value={letters}
-          onChangeText={(text) => this.setState({letters: text}) }
+          value={bee.letters}
+          onChangeText={(text) => {
+            const newbee = new Bee(text)
+            this.setState({
+              bee: newbee,
+            })
+          }}
         />
+
+        <Text>
+          {bee.dispLtrs}
+        </Text>
+
+        <FlatList
+          style={styles.wordList}
+          keyExtractor={(word, idx) => (idx.toString())}
+          data={guesses}
+          renderItem={this.wordListItem}
+        />
+
         <View style={styles.entryBox}>
           <Icon
             name="cancel"
-            style={styles.clearEntry}
-            onPress={() => this.clearEntry()}
+            iconStyle={styles.entryIcon}
+            onPress={this.clearEntry}
           />
-          <Text style={[styles.entryText, (valid ? styles.entryValid : styles.entryBad)]}
-                ref={(el) => (this.elements['entry'] = el)}
-          >
+          <Icon
+            name="backspace"
+            iconStyle={styles.entryIcon}
+            onPress={this.delLetter}
+          />
+          <Text style={[styles.entryText]} ref={this.elements.entry}>
             {entry}
           </Text>
           <Icon
             name="check"
-            style={styles.clearEntry}
-            onPress={this.addEntry}
+            iconStyle={styles.entryIcon}
+            onPress={this.addGuess}
           />
         </View>
+
         <View style={styles.buttonRow}>
-          <LetterButton letter={letters[0]} handler={(ll) => this.addLetter(ll)} />
-          <LetterButton letter={letters[1]} handler={(ll) => this.addLetter(ll)} />
-          <LetterButton letter={letters[2]} handler={(ll) => this.addLetter(ll)} />
-          <LetterButton letter={letters[3]} handler={(ll) => this.addLetter(ll)} />
-          <LetterButton letter={letters[4]} handler={(ll) => this.addLetter(ll)} />
-          <LetterButton letter={letters[5]} handler={(ll) => this.addLetter(ll)} />
-          <LetterButton letter={letters[6]} handler={(ll) => this.addLetter(ll)} />
+          {
+            bee.larry.map((ltr) => (
+              <LetterButton letter={ltr} handler={(ll) => this.addLetter(ll)} />))
+          }
         </View>
+
+        <View style={styles.wordListItemBox}>
+          <Text>
+            Tot:
+            {bee.totScore()}
+          </Text>
+          <Text>
+            Words:
+            {guesses.length}
+          </Text>
+          <Text>
+            {JSON.stringify(bee.wordHist())}
+          </Text>
+        </View>
+
       </View>
     );
   }
@@ -126,11 +180,29 @@ const styles = StyleSheet.create({
     fontSize: 20,
     flex: 4,
   },
+  wordListItemBox: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  wordListItem: {
+    fontSize: 20,
+    flex:     9,
+    padding:  2,
+  },
+  wordListInfo: {
+    fontSize:     20,
+    padding:      2,
+    marginRight: 5,
+    flex: 1,
+  },
   entryValid: {
     backgroundColor: '#cceecc',
   },
   entryBad: {
     backgroundColor: '#eecccc',
+  },
+  entryPangram: {
+    backgroundColor: '#ddddff',
   },
   entryBox: {
     flexDirection: 'row',
@@ -138,12 +210,14 @@ const styles = StyleSheet.create({
     padding: 5,
     margin:  10,
   },
-  clearEntry: {
-    alignSelf: 'flex-end',
+  entryIcon: {
+    marginLeft:  2,
+    marginRight: 2,
   },
   letterButton: {
     padding: 5,
     margin: 5,
+    width: Layout.window.width/9,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -153,9 +227,6 @@ const styles = StyleSheet.create({
   wordList: {
     width: '100%',
   },
-  wordListItem: {
-    padding: 5,
-  }
 });
 
 export default HomeScreen
