@@ -4,6 +4,9 @@ import { useNavigation } from '@react-navigation/native'
 import { Header, Button, Icon, // SearchBar,
 }                        from 'react-native-elements';
 import DrawerNavigator from './DrawerNavigator'
+import BeeListScreen            from '../screens/BeeListScreen'
+import BeeScreen                from '../screens/BeeScreen'
+
 
 const Stack = createStackNavigator();
 
@@ -30,7 +33,17 @@ const Stack = createStackNavigator();
  *  */
 
 const AppNavigator = () => (
-  <DrawerNavigator />
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Home"
+      component={BeeListScreen}
+    />
+    <Stack.Screen
+      name="Bee"
+      component={BeeScreen}
+      options={({ route }) => ({ title: route.params.letters })}
+    />
+  </Stack.Navigator>
 )
 
 export default AppNavigator

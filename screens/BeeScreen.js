@@ -1,9 +1,8 @@
 import * as React     from 'react';
-import { StyleSheet, Text, View, FlatList,
+import { StyleSheet, Text, View, FlatList, SafeAreaView,
 }                     from 'react-native';
 import { Button, Input, Icon,
 }                     from 'react-native-elements'
-import { CommonActions } from '@react-navigation/native';
 //
 import Layout         from '../constants/Layout'
 import HeaderedScreen from '../components/HeaderedScreen'
@@ -20,7 +19,7 @@ const LetterButton = ({ letter, handler }) => (
 
 const initialLetters =  'MAOBLNR'
 
-class HomeScreen extends React.Component {
+class BeeScreen extends React.Component {
   constructor(props) {
     super(props)
     const { route, navigation  } = props
@@ -28,9 +27,10 @@ class HomeScreen extends React.Component {
     this.state = {
       entry: '',
       guesses: [],
+      nogos:   [],
       bee:   new Bee(params.letters||initialLetters),
     }
-    console.log(this.state, 'nav', navigation, navigation.options, 'vals', props)
+    // console.log(this.state, 'nav', navigation, navigation.options, 'vals', props)
   }
 
   elements = {
@@ -59,20 +59,27 @@ class HomeScreen extends React.Component {
       bee.addGuess(entry)
       return ({
         guesses: bee.guesses,
+        nogos:   bee.nogos,
         entry: '',
       })
     })
+    console.log(this.elements)
+    this.elements.entry.focus()
   }
 
   delEntry = (word) => {
     this.setState(({ bee }) => {
       bee.delGuess(word)
-      return ({ guesses: bee.guesses })
+      return ({
+        guesses: bee.guesses,
+        nogos:   bee.nogos,
+      })
     })
   }
 
   validStyle = (guess) => {
-    if (!guess.valid) return styles.entryBad
+    if (!guess.valid)  return styles.entryBad
+    if (guess.nogo)    return styles.nogo
     if (guess.isPan)   return styles.entryPangram
     return styles.entryValid
   }
@@ -99,48 +106,43 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    const { bee, entry, guesses } = this.state
+    const { bee, entry, guesses, nogos, } = this.state
     return (
-      <HeaderedScreen title={bee.dispLtrs} style={styles.container}>
-
-        <Input
-          style={styles.lettersInput}
-          value={bee.letters}
-          onChangeText={(text) => this.setState({ bee: new Bee(text) })}
-        />
-
-        <Button
-        title="hi"
-          onPress={() => this.newNav(this.props.navigation)}
-        />
-
-        <FlatList
-          style={styles.wordList}
-          keyExtractor={(word, idx) => (idx.toString())}
-          data={guesses}
-          renderItem={this.wordListItem}
-        />
-
-        <View style={styles.entryBox}>
-          <Icon
-            name="cancel"
-            iconStyle={styles.entryIcon}
-            onPress={this.clearEntry}
+      <SafeAreaView style={styles.container}>
+        <View style={styles.wordListBox}>
+          <FlatList
+            style={[styles.wordList, styles.wordListLeft]}
+            keyExtractor={(word, idx) => (idx.toString())}
+            data={guesses}
+            renderItem={this.wordListItem}
           />
-          <Icon
-            name="backspace"
-            iconStyle={styles.entryIcon}
-            onPress={this.delLetter}
-          />
-          <Text style={[styles.entryText]} ref={this.elements.entry}>
-            {entry}
-          </Text>
-          <Icon
-            name="check"
-            iconStyle={styles.entryIcon}
-            onPress={this.addGuess}
+          <FlatList
+            style={[styles.wordList, styles.wordListRight]}
+            keyExtractor={(word, idx) => (idx.toString())}
+            data={nogos}
+            renderItem={this.wordListItem}
           />
         </View>
+        
+        <Input
+          style={[styles.entryText]}
+          ref={(inp) => { this.elements.entry = inp }}
+          autoCapitalize  = "none"
+          autoCorrect     = {false}
+          autoCompleteType = "off"
+          value={entry}
+          leftIcon={(
+            <View style={styles.entryBox}>
+              <Icon name="backspace" iconStyle={styles.entryIcon} onPress={this.delLetter} />
+              <Icon name="cancel" iconStyle={styles.entryIcon} onPress={this.clearEntry} />
+            </View>
+          )}
+          rightIcon={(
+            <Icon name="check" iconStyle={styles.entryIcon} onPress={this.addGuess} />
+          )}
+          onChangeText={(text) => this.setState({ entry: bee.normEntry(text) })}
+          onSubmitEditing ={this.addGuess}
+        />
 
         <View style={styles.buttonRow}>
           {
@@ -162,13 +164,12 @@ class HomeScreen extends React.Component {
             {JSON.stringify(bee.wordHist())}
           </Text>
         </View>
-
-      </HeaderedScreen>
+      </SafeAreaView>
     );
   }
 }
 
-HomeScreen.navigationOptions = {
+BeeScreen.navigationOptions = {
   header: (
     <Text>Hi</Text>
   ),
@@ -185,7 +186,23 @@ const styles = StyleSheet.create({
   },
   entryText: {
     fontSize: 20,
+    width: "60%",
     flex: 4,
+  },
+  wordListBox: {
+    width: '100%',
+    flex:   6,
+    flexDirection: 'row',
+  },
+  wordList: {
+    width: '100%',
+    flex: 1,
+  },
+  wordListLeft: {
+    backgroundColor: '#fff',
+  },
+  wordListRight: {
+    backgroundColor: '#eee',
   },
   wordListItemBox: {
     flexDirection: 'row',
@@ -214,8 +231,6 @@ const styles = StyleSheet.create({
   entryBox: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    padding: 5,
-    margin:  10,
   },
   entryIcon: {
     marginLeft:  2,
@@ -231,9 +246,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '80%',
   },
-  wordList: {
-    width: '100%',
-  },
 });
 
-export default HomeScreen
+export default BeeScreen

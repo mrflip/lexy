@@ -1,16 +1,19 @@
-import * as React from 'react'
+import * as React               from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem,
-} from '@react-navigation/drawer'
+}                               from '@react-navigation/drawer'
+import { Button, Input, Icon, ListItem,
+}                     from 'react-native-elements'
 import { createStackNavigator } from '@react-navigation/stack'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation }        from '@react-navigation/native'
 //
-import HomeScreen from '../screens/HomeScreen'
-import LinksScreen from '../screens/LinksScreen'
+import BeeScreen                from '../screens/BeeScreen'
+import BeeListScreen            from '../screens/BeeListScreen'
+import AboutScreen              from '../screens/AboutScreen'
 
 const Drawer = createDrawerNavigator()
 const Stack = createStackNavigator();
 
-const Bees = ['H/AICRGL', 'M/BNORAL']
+const Bees = ['H/AICRGL', 'M/BNORAL', 'M/OUFNRL', ]
 
 const CustomDrawerContent = (props) => {
   const { navigation } = props
@@ -28,6 +31,11 @@ const CustomDrawerContent = (props) => {
         />
       ))
       }
+      <Button
+        title="New Bee"
+        icon={<Icon name="add-circle-outline" />}
+        onPress={() => Bees.push('L/AEIMNP') }
+      />
     </DrawerContentScrollView>
   );
 }
@@ -35,26 +43,28 @@ const CustomDrawerContent = (props) => {
 const FooDrawerNavigator = () => (
   <Drawer.Navigator
     drawerContent={CustomDrawerContent}
+    default="Home"
   >
+    <Drawer.Screen name="Home" component={BeeListScreen} />
     {
-      ['NEWBEE'].map((letters) => (
-        <Drawer.Screen key={letters} name={letters} component={HomeScreen} options={{ letters: letters, bob: 7 }} />
+      Bees.map((letters) => (
+        <Drawer.Screen key={letters} name={letters} component={BeeScreen} options={{ letters: letters, bob: 7 }} />
       ))
     }
-    <Drawer.Screen name="About" component={LinksScreen} />
+    <Drawer.Screen name="About" component={AboutScreen} />
   </Drawer.Navigator>
 );
 
 const DrawerNavigator = () => (
   <Stack.Navigator
-  headerMode="none"
-  options={{ headerShown: false, headerMode: 'none' }}
+    headerMode="none"
+    options={{ headerShown: false, headerMode: 'none' }}
   >
-  <Stack.Screen
-  name="Root"
-  component={FooDrawerNavigator}
-  />
-</Stack.Navigator>
+    <Stack.Screen
+      name="Root"
+      component={FooDrawerNavigator}
+    />
+  </Stack.Navigator>
 
 )
 
