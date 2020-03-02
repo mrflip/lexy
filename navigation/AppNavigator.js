@@ -41,7 +41,16 @@ const AppNavigator = () => (
     <Stack.Screen
       name="Bee"
       component={BeeScreen}
-      options={({ route }) => ({ title: route.params.letters })}
+      options={{
+        route: ({ route }) => ({ title: route.params.letters }),
+        headerRight: () => (
+          <Button
+            title="Info"
+                   color="#fff"
+                   onPress={() => alert('This is a button!')}
+          />
+        ),
+      }}
     />
   </Stack.Navigator>
 )

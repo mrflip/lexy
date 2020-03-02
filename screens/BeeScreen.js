@@ -1,7 +1,7 @@
 import * as React     from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView,
+import { StyleSheet, Text, View, FlatList, SafeAreaView, SectionList,
 }                     from 'react-native';
-import { Button, Input, Icon,
+import { Button, Input, Icon, Divider,
 }                     from 'react-native-elements'
 //
 import Layout         from '../constants/Layout'
@@ -22,13 +22,14 @@ const initialLetters =  'MAOBLNR'
 class BeeScreen extends React.Component {
   constructor(props) {
     super(props)
-    const { route, navigation  } = props
-    const { name, params={} } = route
+    const { route  } = props
+    const { name, params = {} } = route
     this.state = {
-      entry: '',
+      entry:   '',
       guesses: [],
+      gbs:     [],
       nogos:   [],
-      bee:   new Bee(params.letters||initialLetters),
+      bee:     new Bee(params.letters),
     }
     // console.log(this.state, 'nav', navigation, navigation.options, 'vals', props)
   }
@@ -51,7 +52,9 @@ class BeeScreen extends React.Component {
     })
   }
 
-  clearEntry = () => this.setState(() => ({ entry: '' }))
+  clearEntry = () => (
+    this.setState(() => ({ entry: '' }))
+  )
 
   addGuess = () => {
     this.setState(({ entry, bee }) => {
@@ -59,11 +62,11 @@ class BeeScreen extends React.Component {
       bee.addGuess(entry)
       return ({
         guesses: bee.guesses,
+        gbs:     bee.guessesByScore(),
         nogos:   bee.nogos,
         entry: '',
       })
     })
-    console.log(this.elements)
     this.elements.entry.focus()
   }
 
@@ -72,6 +75,7 @@ class BeeScreen extends React.Component {
       bee.delGuess(word)
       return ({
         guesses: bee.guesses,
+        gbs:     bee.guessesByScore(),
         nogos:   bee.nogos,
       })
     })
@@ -86,6 +90,7 @@ class BeeScreen extends React.Component {
 
   wordListItem = ({ item }) => {
     const guess = item
+    console.log('wli', guess)
     return (
       <View style={styles.wordListItemBox}>
         <Text style={styles.wordListInfo}>{guess.score}</Text>
@@ -106,15 +111,21 @@ class BeeScreen extends React.Component {
   }
 
   render() {
-    const { bee, entry, guesses, nogos, } = this.state
+    const { bee, entry, guesses, nogos, gbs } = this.state
+    console.log('gbs', gbs)
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.wordListBox}>
-          <FlatList
+          <SectionList
             style={[styles.wordList, styles.wordListLeft]}
-            keyExtractor={(word, idx) => (idx.toString())}
-            data={guesses}
+            keyExtractor={(guess, idx) => (guess.word)}
+            sections={gbs}
             renderItem={this.wordListItem}
+            ListEmptyComponent={(<Text>Make a Guess</Text>)}
+            renderSectionHeader={({ section, ...rest }) => {
+              console.log('rsh', section, rest)
+              return (<Text style={styles.wordListHeader}>{section.title}</Text>)
+            }}
           />
           <FlatList
             style={[styles.wordList, styles.wordListRight]}
@@ -181,9 +192,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
-  lettersInput: {
-    fontSize: 20,
-  },
   entryText: {
     fontSize: 20,
     width: "60%",
@@ -207,6 +215,12 @@ const styles = StyleSheet.create({
   wordListItemBox: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
+  },
+  wordListHeader: {
+    fontSize: 20,
+    backgroundColor: '#eee',
+    textAlign: 'center',
+    padding:  2,
   },
   wordListItem: {
     fontSize: 20,
@@ -239,7 +253,7 @@ const styles = StyleSheet.create({
   letterButton: {
     padding: 5,
     margin: 5,
-    width: Layout.window.width/9,
+    width: Layout.window.width / 9,
   },
   buttonRow: {
     flexDirection: 'row',
