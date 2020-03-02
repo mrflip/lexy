@@ -22,16 +22,17 @@ const initialLetters =  'MAOBLNR'
 class BeeScreen extends React.Component {
   constructor(props) {
     super(props)
-    const { route  } = props
-    const { name, params = {} } = route
+    const { route  }      = props
+    const { params = {} } = route
+    const { bee } = params
     this.state = {
       entry:   '',
-      guesses: [],
-      gbs:     [],
-      nogos:   [],
-      bee:     new Bee(params.letters),
+      guesses: bee.guesses,
+      gbs:     bee.guessesByScore(),
+      nogos:   bee.nogos,
+      bee:     bee,
     }
-    // console.log(this.state, 'nav', navigation, navigation.options, 'vals', props)
+    console.log('bscr', this.state, params)
   }
 
   elements = {
@@ -88,18 +89,20 @@ class BeeScreen extends React.Component {
     return styles.entryValid
   }
 
-  wordListItem = ({ item }) => {
+  guessItem = ({ item }) => {
     const guess = item
-    console.log('wli', guess)
+    const vStyle = this.validStyle(guess)
     return (
-      <View style={styles.wordListItemBox}>
-        <Text style={styles.wordListInfo}>{guess.score}</Text>
-        <Text style={[styles.wordListItem, this.validStyle(guess)]}>
+      <View style={styles.guessBox}>
+        <Text numberOfLines={1} style={styles.guessInfo}>
+          {guess.score}
+        </Text>
+        <Text style={[styles.guess, vStyle]}>
           {guess.word}
         </Text>
         <Icon
           name="cancel"
-          style={styles.clearEntry}
+          style={[styles.clearEntry]}
           onPress={() => this.delEntry(guess.word)}
         />
       </View>
@@ -120,18 +123,18 @@ class BeeScreen extends React.Component {
             style={[styles.wordList, styles.wordListLeft]}
             keyExtractor={(guess, idx) => (guess.word)}
             sections={gbs}
-            renderItem={this.wordListItem}
+            renderItem={this.guessItem}
             ListEmptyComponent={(<Text>Make a Guess</Text>)}
             renderSectionHeader={({ section, ...rest }) => {
               console.log('rsh', section, rest)
-              return (<Text style={styles.wordListHeader}>{section.title}</Text>)
+              return (<Text style={styles.guessHeader}>{section.title}</Text>)
             }}
           />
           <FlatList
             style={[styles.wordList, styles.wordListRight]}
             keyExtractor={(word, idx) => (idx.toString())}
             data={nogos}
-            renderItem={this.wordListItem}
+            renderItem={this.guessItem}
           />
         </View>
         
@@ -162,7 +165,7 @@ class BeeScreen extends React.Component {
           }
         </View>
 
-        <View style={styles.wordListItemBox}>
+        <View style={styles.guessBox}>
           <Text>
             Tot:
             {bee.totScore()}
@@ -190,20 +193,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems:      'center',
   },
   entryText: {
     fontSize: 20,
     width: "60%",
     flex: 4,
   },
+  //
   wordListBox: {
-    width: '100%',
+    width:           '100%',
     flex:   6,
-    flexDirection: 'row',
+    flexDirection:   'row',
   },
   wordList: {
-    width: '100%',
+    width:           '100%',
     flex: 1,
   },
   wordListLeft: {
@@ -212,26 +216,31 @@ const styles = StyleSheet.create({
   wordListRight: {
     backgroundColor: '#eee',
   },
-  wordListItemBox: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
+  //
+  guessBox: {
+    flexDirection:   'row',
+    justifyContent:  'flex-start',
+    alignItems:      'center',
+    flexWrap:        'nowrap',
   },
-  wordListHeader: {
+  guess: {
+    fontSize:          20,
+    flex:               8,
+    padding:            2,
+    paddingLeft:        5,
+  },
+  guessInfo: {
+    fontSize:          16,
+    padding:            2,
+    flex:               1,
+    flexWrap:           'nowrap',
+    textAlign:          'right',
+  },
+  guessHeader: {
     fontSize: 20,
     backgroundColor: '#eee',
-    textAlign: 'center',
+    textAlign:       'center',
     padding:  2,
-  },
-  wordListItem: {
-    fontSize: 20,
-    flex:     9,
-    padding:  2,
-  },
-  wordListInfo: {
-    fontSize:     20,
-    padding:      2,
-    marginRight: 5,
-    flex: 1,
   },
   entryValid: {
     backgroundColor: '#cceecc',
@@ -243,8 +252,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddddff',
   },
   entryBox: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
+    flexDirection:   'row',
+    justifyContent:  'flex-start',
   },
   entryIcon: {
     marginLeft:  2,
@@ -256,9 +265,9 @@ const styles = StyleSheet.create({
     width: Layout.window.width / 9,
   },
   buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '80%',
+    flexDirection:   'row',
+    justifyContent:  'space-around',
+    width:           '80%',
   },
 });
 

@@ -1,17 +1,27 @@
-import * as React from 'react';
+import * as React              from 'react';
 import { Platform, StatusBar, StyleSheet, View, YellowBox,
-} from 'react-native';
-import { SplashScreen } from 'expo';
-import * as Font from 'expo-font';
-import { Ionicons } from '@expo/vector-icons';
+}                              from 'react-native';
+import { SplashScreen }        from 'expo';
+import * as Font               from 'expo-font';
+import { Ionicons }            from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
-
-//import BottomTabNavigator from './navigation/BottomTabNavigator';
-import AppNavigator from './navigation/AppNavigator'
-import useLinking from './navigation/useLinking';
+import {
+  ApolloProvider, ApolloClient, HttpLink, InMemoryCache,
+}                              from '@apollo/client'
+//
+import AppNavigator            from './navigation/AppNavigator'
+import useLinking              from './navigation/useLinking';
 
 // Don't yell at me about other modules' error messages
 YellowBox.ignoreWarnings(['RootErrorBoundary'])
+
+const apollo = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: new HttpLink({
+    // uri: Secrets.samwise.URL,
+    uri: 'http://localhost:4000/graphql',
+  }),
+})
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -49,12 +59,14 @@ export default function App(props) {
     return null;
   } else {
     return (
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-        <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <AppNavigator />
-        </NavigationContainer>
-      </View>
+      <ApolloProvider client={apollo}>
+        <View style={styles.container}>
+          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+          <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
+            <AppNavigator />
+          </NavigationContainer>
+        </View>
+      </ApolloProvider>
     );
   }
 }
