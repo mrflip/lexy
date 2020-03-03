@@ -11,7 +11,7 @@ const validStyle = (guess) => {
   return styles.entryValid
 }
 
-const guessItem = ({ item, delEntry }) => {
+const guessItem = ({ item, delGuess }) => {
   const guess = item
   const vStyle = validStyle(guess)
   return (
@@ -25,37 +25,37 @@ const guessItem = ({ item, delEntry }) => {
       <Icon
         name="cancel"
         style={[styles.clearEntry]}
-        onPress={() => delEntry(guess.word)}
+        onPress={() => delGuess(guess.word)}
       />
     </View>
   )
 }
 
-const GuessList = ({ guesses, delEntry }) => (
+const GuessList = ({ guesses, delGuess }) => (
   <SectionList
     style={[styles.wordList]}
     keyExtractor={(guess) => (guess.word)}
     sections={guesses}
-    renderItem={(info) => guessItem({ delEntry, ...info })}
+    renderItem={(info) => guessItem({ delGuess, ...info })}
     ListEmptyComponent={(<Text>Make a Guess</Text>)}
     renderSectionHeader={({ section }) => (<Text style={styles.guessHeader}>{section.title}</Text>)}
   />
 )
 
-const NogosList = ({ nogos, delEntry }) => (
+const NogosList = ({ nogos, delGuess }) => (
   <FlatList
     ListHeaderComponent={<Text style={styles.guessHeader}>No-Go</Text>}
     style={[styles.wordList, styles.nogosList]}
     keyExtractor={(word, idx) => (idx.toString())}
     data={nogos}
-    renderItem={(info) => guessItem({ delEntry, ...info })}
+    renderItem={(info) => guessItem({ delGuess, ...info })}
   />
 )
 
-const WordLists = ({ guesses, nogos, delEntry }) => (
+const WordLists = ({ guesses, nogos, delGuess }) => (
   <View style={styles.wordListBox}>
-    <GuessList guesses={guesses} delEntry={delEntry} />
-    <NogosList nogos={nogos} delEntry={delEntry} />
+    <GuessList guesses={guesses} delGuess={delGuess} />
+    <NogosList nogos={nogos} delGuess={delGuess} />
   </View>
 )
 

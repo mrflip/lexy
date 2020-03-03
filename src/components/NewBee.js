@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { StyleSheet, View,
 }                          from 'react-native'
-import { Button, Input, Icon, ListItem, Text,
+import { Button, Input, Icon,
 }                          from 'react-native-elements'
-import { useQuery, useMutation,
+import { useMutation,
 }                          from '@apollo/client';
 import { Formik }          from 'formik'
 import * as Yup            from 'yup'
@@ -20,13 +20,13 @@ const validationSchema = Yup.object().shape({
 })
 
 const addBee = (addBeeMu, entry) => {
-  addBeeMu({ variables: { letters: entry, } })
+  addBeeMu({ variables: { letters: entry } })
 }
 
 
 const NewBee = () => {
   const [entry, setEntry]  = useState('')
-  const [addBeeMu, { data }] = useMutation(Ops.bee_put_mu)
+  const [addBeeMu] = useMutation(Ops.bee_put_mu)
   //
   return (
     <View style={styles.container}>
@@ -36,7 +36,7 @@ const NewBee = () => {
         placeholder      ="New Letters; Main Letter First"
         autoCapitalize   = "none"
         autoCorrect      = {false}
-        autoCompleteType = "off"      
+        autoCompleteType = "off"
         onChangeText     ={(text) => setEntry(Bee.normalize(text).toUpperCase())}
       />
       <Button
@@ -48,16 +48,6 @@ const NewBee = () => {
     </View>
   )
 }
-
-    /* 
- * const NewBee = () => {
- *   return (
- *     <Mutation mutation={Ops.bee_put_mu}>
- *       
- *     </Mutation>
- *   )
- * }
- *  */
 
 const styles = StyleSheet.create({
   container: {

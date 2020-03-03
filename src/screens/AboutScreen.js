@@ -5,9 +5,8 @@ import * as WebBrowser from 'expo-web-browser';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import HeaderedScreen from '../components/HeaderedScreen'
 
-export default function LinksScreen() {
-  return (
-    <HeaderedScreen title="About">
+const LinksScreen = () => (
+  <HeaderedScreen title="About">
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <OptionButton
         icon="md-school"
@@ -28,14 +27,13 @@ export default function LinksScreen() {
         isLastOption
       />
     </ScrollView>
-    </HeaderedScreen>
-  );
-}
+  </HeaderedScreen>
+)
 
 function OptionButton({ icon, label, onPress, isLastOption }) {
   return (
     <RectButton style={[styles.option, isLastOption && styles.lastOption]} onPress={onPress}>
-      <View style={{ flexDirection: 'row' }}>
+      <View style={styles.row}>
         <View style={styles.optionIconContainer}>
           <Ionicons name={icon} size={22} color="rgba(0,0,0,0.35)" />
         </View>
@@ -51,6 +49,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
+  },
+  row: {
+    flexDirection: 'row',
   },
   contentContainer: {
     paddingTop: 15,
@@ -75,3 +76,5 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
 });
+
+export default LinksScreen

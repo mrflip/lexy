@@ -1,10 +1,9 @@
 import * as React               from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem,
 }                               from '@react-navigation/drawer'
-import { Button, Input, Icon, ListItem,
+import { Button, Icon,
 }                     from 'react-native-elements'
 import { createStackNavigator } from '@react-navigation/stack'
-import { useNavigation }        from '@react-navigation/native'
 //
 import BeeScreen                from '../screens/BeeScreen'
 import BeeListScreen            from '../screens/BeeListScreen'
@@ -13,28 +12,30 @@ import AboutScreen              from '../screens/AboutScreen'
 const Drawer = createDrawerNavigator()
 const Stack = createStackNavigator();
 
-const Bees = ['H/AICRGL', 'M/BNORAL', 'M/OUFNRL', ]
+const Bees = ['H/AICRGL', 'M/BNORAL', 'M/OUFNRL']
 
 const CustomDrawerContent = (props) => {
   const { navigation } = props
   return (
+    // eslint-disable-next-line
     <DrawerContentScrollView {...props}>
+      // eslint-disable-next-line
       <DrawerItemList {...props} />
-      { Bees.map((letters) => (
-        <DrawerItem
-          label={letters}
-          key={letters}
-          onPress={() => {
-            console.log('nav', letters)
-            navigation.navigate('NEWBEE', { letters: letters })
-          }}
-        />
-      ))
+      {
+        Bees.map((letters) => (
+          <DrawerItem
+            label={letters}
+            key={letters}
+            onPress={() => {
+              navigation.navigate('NEWBEE', { letters })
+            }}
+          />
+        ))
       }
       <Button
         title="New Bee"
         icon={<Icon name="add-circle-outline" />}
-        onPress={() => Bees.push('L/AEIMNP') }
+        onPress={() => Bees.push('L/AEIMNP')}
       />
     </DrawerContentScrollView>
   );
@@ -48,7 +49,7 @@ const FooDrawerNavigator = () => (
     <Drawer.Screen name="Home" component={BeeListScreen} />
     {
       Bees.map((letters) => (
-        <Drawer.Screen key={letters} name={letters} component={BeeScreen} options={{ letters: letters, bob: 7 }} />
+        <Drawer.Screen key={letters} name={letters} component={BeeScreen} options={{ letters }} />
       ))
     }
     <Drawer.Screen name="About" component={AboutScreen} />

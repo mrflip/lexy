@@ -46,9 +46,9 @@ export default function App(props) {
           ...Ionicons.font,
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
         });
-      } catch (e) {
+      } catch (err) {
         // We might want to provide this error information to an error reporting service
-        console.warn(e);
+        console.warn(err); // eslint-disable-line
       } finally {
         setLoadingComplete(true);
         SplashScreen.hide();

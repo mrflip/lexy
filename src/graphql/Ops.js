@@ -10,11 +10,11 @@ const Ops = {
         datestr
       }
     }
-  `,      
-  
+  `,
+
   bee_list_qy: gql`
     query blist($cursor: String) {
-      bee_list(limit: 2, cursor: $cursor) {
+      bee_list(limit: 200, cursor: $cursor) {
         bees {
           letters, datestr, guesses, nogos
         }
@@ -26,7 +26,7 @@ const Ops = {
   bee_put_mu: gql`
     mutation bee_put_mu($letters: String!, $guesses: [String!]) {
       bee_put(
-        letters: $letters, guesses: $guesses, nogos: [], 
+        letters: $letters, guesses: $guesses, nogos: [],
       ) {
         success
         message
@@ -38,7 +38,7 @@ const Ops = {
   bee_del_mu: gql`
     mutation bee_put_mu($letters: String!, $guesses: [String!]) {
       bee_put(
-        letters: $letters, guesses: $guesses, nogos: [], 
+        letters: $letters, guesses: $guesses, nogos: [],
       ) {
         success
         message

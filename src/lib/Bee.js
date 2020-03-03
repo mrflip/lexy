@@ -14,9 +14,9 @@ class Bee {
   }
 
   static normalize(ltrs) {
-    const lonly = ltrs.replace(/[^A-Za-z]/g,'')
+    const lonly = ltrs.replace(/[^A-Za-z]/g, '')
     const larr  = lonly.toLowerCase().split('')
-    const luniq = [...new Set(larr)].slice(0,7)
+    const luniq = [...new Set(larr)].slice(0, 7)
     const firl  = luniq.shift()
     luniq.sort((aa, bb) => {
       if (VOWELS.has(aa) && !VOWELS.has(bb)) return -1
@@ -103,12 +103,22 @@ class Bee {
     return this.guesses.reduce((tot, guess) => (tot + guess.score), 0)
   }
 
+  serialize() {
+    return {
+      letters: this.letters,
+      datestr: this.datestr,
+      guesses: this.guesses.map((gg) => gg.word),
+      nogos:   this.nogos.map((gg) => gg.word),
+    }
+  }
+
   static from(obj) {
     const bee =  Object.assign(new Bee(obj.letters), obj)
     bee.guesses = bee.guesses.map((gg) => new Guess(gg, bee))
     bee.nogos   = bee.nogos.map((gg)   => new Guess(gg, bee))
     return bee
   }
+
 }
 
 export default Bee

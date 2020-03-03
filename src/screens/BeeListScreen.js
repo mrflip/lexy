@@ -15,7 +15,7 @@ const BeeListScreen = ({ navigation }) => {
   if (error)   return renderError(error);
   if (!data)   return <Text>No Data</Text>;
   const bees = data.bee_list.bees.map((obj) => Bee.from(obj))
-  console.log(data, bees)
+  // console.log(data, bees)
   return (
     <SafeAreaView style={styles.container}>
       <NewBee />
@@ -45,7 +45,7 @@ const renderError = (error) => {
 };
 
 const navToBee = (bee, event, navigation) => {
-  navigation.push("Bee", { letters: bee.letters, bee })
+  navigation.push("Bee", { letters: bee.letters })
 }
 
 const beeListItem = ({ item, navigation }) => (
@@ -76,7 +76,7 @@ const fetcher = (data, fetchMore) => (() => {
       })
       // console.log(ret)
       return ret
-    }
+    },
   })
 })
 
