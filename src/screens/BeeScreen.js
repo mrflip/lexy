@@ -73,14 +73,18 @@ const renderError = (error) => {
   );
 };
 
-const BeeScreen = ({ route }) => {
+const BeeScreen = ({ navigation, route }) => {
   const { params = {} } = route
   const { letters } = params
+  //
   const { loading, error, data } = useQuery(Ops.bee_get_qy, { variables: { letters } });
-  if (loading) return <Text>Loading...</Text>;
-  if (error)   return renderError(error);
-  if (!data)   return <Text>No Data</Text>;
-  const bee = Bee.from(data.bee_get)
+  if (loading)               return <Text>Loading...</Text>;
+  if (error)                 return renderError(error);
+  if (!data)                 return <Text>No Data</Text>;
+  if (!data.bee_get.success) return renderError(data.bee_get.message);
+  //
+  const bee = Bee.from(data.bee_get.bee)
+  navigation.setOptions({ title: bee.dispLtrs })
   console.log(data, bee)
   return (
     <BeeScreenComp bee={bee} />

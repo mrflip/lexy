@@ -14,15 +14,15 @@ const BeeListScreen = ({ navigation }) => {
   if (loading) return <Text>Loading...</Text>;
   if (error)   return renderError(error);
   if (!data)   return <Text>No Data</Text>;
-  const bees = data.bee_list.bees.map((obj) => Bee.from(obj))
+  // const bees = data.bee_list.bees.map((obj) => Bee.from(obj))
   // console.log(data, bees)
   return (
     <SafeAreaView style={styles.container}>
       <NewBee />
       <FlatList
         style        ={styles.wordList}
-        keyExtractor ={(word, idx) => (idx.toString())}
-        data         ={bees}
+        keyExtractor ={(letters, idx) => (letters+idx)}
+        data         ={data.bee_list.bees}
         renderItem   ={(info) => beeListItem({ ...info, navigation })}
       />
       <Button title="more" onPress={fetcher(data, fetchMore)} />
@@ -45,15 +45,18 @@ const renderError = (error) => {
 };
 
 const navToBee = (bee, event, navigation) => {
-  navigation.push("Bee", { letters: bee.letters })
+  navigation.push("Bee", { title: bee.letters, letters: bee.letters })
 }
 
-const beeListItem = ({ item, navigation }) => (
-  <ListItem
-    title={item.dispLtrs}
-    onPress={(event) => navToBee(item, event, navigation)}
-  />
-)
+const beeListItem = ({ item, navigation }) => {
+  const bee = Bee.from(item)
+  return (
+    <ListItem
+      title={bee.dispLtrs}
+      onPress={(event) => navToBee(bee, event, navigation)}
+    />
+  )
+}
 
 const fetcher = (data, fetchMore) => (() => {
   if (!data.bee_list.cursor) { return }

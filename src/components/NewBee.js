@@ -19,14 +19,25 @@ const validationSchema = Yup.object().shape({
     .matches(/^([a-zA-Z][^a-zA-Z]*){7}$/, "Enter 7 letters"),
 })
 
-const addBee = (addBeeMu, entry) => {
+const addBeePlz = (addBeeMu, entry) => {
   addBeeMu({ variables: { letters: entry } })
 }
 
 
 const NewBee = () => {
   const [entry, setEntry]  = useState('')
-  const [addBeeMu] = useMutation(Ops.bee_put_mu)
+  const [addBeeMu] = useMutation(Ops.bee_put_mu, {
+    update: (cache, { data: { bee_put, ...restDat } }) => {
+      console.log('bp', bee_put, 'rest', restDat)
+      const { bee_list: { bees } } = cache.readQuery({ query: Ops.bee_list_qy })
+      console.log('bp', bees)
+      cache.writeQuery({
+        query: Ops.bee_list_qy,
+        data:  { bee_list: { bees: bees.concat([bee_put.bee]) } },
+      })
+    },
+  })
+
   //
   return (
     <View style={styles.container}>
@@ -42,7 +53,7 @@ const NewBee = () => {
       <Button
         title            =" New Bee"
         icon             ={<Icon name="add-circle-outline" />}
-        onPress          ={() => { addBee(addBeeMu, entry); setEntry('') }}
+        onPress          ={() => { addBeePlz(addBeeMu, entry); setEntry('') }}
         style            ={styles.newBeeBtn}
       />
     </View>
