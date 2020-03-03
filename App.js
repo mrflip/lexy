@@ -1,16 +1,17 @@
-import * as React              from 'react';
+import * as React              from 'react'
 import { Platform, StatusBar, StyleSheet, View, YellowBox,
-}                              from 'react-native';
-import { SplashScreen }        from 'expo';
-import * as Font               from 'expo-font';
-import { Ionicons }            from '@expo/vector-icons';
-import { NavigationContainer } from '@react-navigation/native';
+}                              from 'react-native'
+import { SplashScreen }        from 'expo'
+import * as Font               from 'expo-font'
+import { Ionicons }            from '@expo/vector-icons'
+import { NavigationContainer } from '@react-navigation/native'
 import {
   ApolloProvider, ApolloClient, HttpLink, InMemoryCache,
 }                              from '@apollo/client'
 //
-import AppNavigator            from './navigation/AppNavigator'
-import useLinking              from './navigation/useLinking';
+import AppNavigator            from './src/navigation/AppNavigator'
+import useLinking              from './src/navigation/useLinking'
+import { typeDefs, resolvers } from './src/graphql/resolvers'
 
 // Don't yell at me about other modules' error messages
 YellowBox.ignoreWarnings(['RootErrorBoundary'])
@@ -21,6 +22,8 @@ const apollo = new ApolloClient({
     // uri: Secrets.samwise.URL,
     uri: 'http://localhost:4000/graphql',
   }),
+  typeDefs,
+  resolvers,
 })
 
 export default function App(props) {

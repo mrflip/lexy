@@ -4,7 +4,7 @@ import { StyleSheet, View,
 }                           from 'react-native'
 import { Ionicons }         from '@expo/vector-icons'
 //
-import Colors               from '../constants/Colors'
+import Colors               from '../lib/Colors'
 
 const inputIcons = {
   email:    'ios-mail',
