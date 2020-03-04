@@ -8,7 +8,7 @@ class Bee {
     this.letters    = Bee.normalize(ltrs)
     this.mainLetter = this.letters[0]  //eslint-disable-line
     this.pangramRe  = Bee.makePangramRe(this.letters)
-    this.normRe     = Bee.makeNormRe(this.letters)
+    this.rejectRe     = Bee.makeRejectRe(this.letters)
     this.guesses    = []
     this.nogos      = []
   }
@@ -43,7 +43,7 @@ class Bee {
     return new RegExp(letters.split('').map((ltr) => `(?=.*${ltr})`).join(''))
   }
 
-  static makeNormRe(letters) {
+  static makeRejectRe(letters) {
     return new RegExp(`[^${letters}]`, 'g')
   }
 
@@ -52,7 +52,7 @@ class Bee {
     || this.nogos.some((guess)  => (guess.word === word)))
 
   normEntry = (text) => (
-    text.toLowerCase().replace(this.normRe, '')
+    text.toLowerCase().replace(this.rejectRe, '')
   )
 
   guessesByScore = () => (

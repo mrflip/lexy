@@ -3,10 +3,12 @@ import { StyleSheet, View,
 }                          from 'react-native'
 import { Button, Input, Icon,
 }                          from 'react-native-elements'
+import { useMutation }     from '@apollo/client'
 import { Formik }          from 'formik'
 import * as Yup            from 'yup'
 //
-import Layout         from '../lib/Layout'
+import Layout              from '../lib/Layout'
+import Ops                 from '../graphql/Ops'
 
 const LetterButton = ({ letter, handler }) => (
   <Button
@@ -16,15 +18,21 @@ const LetterButton = ({ letter, handler }) => (
   />
 )
 
+// bee_get({"letters":"CAIHLNP"}): {"__typename":"BeeGetResp","success":true,"message":"Bee 'CAIHLNP' gotten","bee":{"__ref":"Bee:{\"letters\":\"CAIHLNP\"}"}}
+
+
 const GuessInput = ({ bee, addToBee }) => {
   const [entry, setEntry] = useState('')
 
   const addLetter  = (letter) => setEntry(entry + letter)
   const delLetter  = ()       => setEntry(entry.substring(0, entry.length - 1))
   const clearEntry = ()       => setEntry('')
+  const [beePutMu] = useMutation(Ops.bee_put_mu)
 
   const addGuess = () => {
-    addToBee(entry)
+    if (bee.hasWord(entry)) { clearEntry(); return }
+    bee.addGuess(entry)
+    beePutMu({ variables: bee.serialize() })
     clearEntry()
   }
 

@@ -40,9 +40,9 @@ const Ops = {
   `,
 
   bee_put_mu: gql`
-  mutation bee_put_mu($letters: String!, $guesses: [String!], $nogos: [String!]) {
+  mutation bee_put_mu($letters: String!, $guesses: [String!], $nogos: [String!], $datestr: String) {
     bee_put(
-      letters: $letters, guesses: $guesses, nogos: $nogos,
+      letters: $letters, guesses: $guesses, nogos: $nogos, datestr: $datestr
     ) {
       success
       message

@@ -46,7 +46,7 @@ const renderError = (error) => {
 const BeeListItem = ({ item, navigation }) => {
   const bee = Bee.from(item)
 
-  const [delBeeMu] = useMutation(Ops.bee_del_mu, {
+  const [beeDelMu] = useMutation(Ops.bee_del_mu, {
     update: (cache, { data: { bee_del: { dead_bee } } }) => {
       const old_data = cache.readQuery({ query: Ops.bee_list_ids_qy })
       const { bee_list: { bees } } = old_data
@@ -55,6 +55,7 @@ const BeeListItem = ({ item, navigation }) => {
         ...old_data,
         bee_list: { ...old_data.bee_list, bees: new_bees }
       }
+      console.log(new_data)
       cache.writeQuery({
         query: Ops.bee_list_ids_qy,
         data:  new_data,
@@ -62,7 +63,7 @@ const BeeListItem = ({ item, navigation }) => {
     }
   })
   
-  const beeDelPlz = () => delBeeMu({ variables: { letters: bee.letters } })
+  const beeDelPlz = () => beeDelMu({ variables: { letters: bee.letters } })
   
   return (
     <ListItem

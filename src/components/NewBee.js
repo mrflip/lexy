@@ -31,7 +31,7 @@ const NewBee = () => {
       const new_data = { ...old_data,
         bee_list: { ...old_data.bee_list, bees: new_bees }
       }
-      // console.log(new_data)
+      console.log(new_data)
       cache.writeQuery({
         query: Ops.bee_list_ids_qy,
         data:  new_data,

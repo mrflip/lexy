@@ -1,62 +1,35 @@
 import * as React     from 'react';
 import { StyleSheet, Text, View, SafeAreaView,
 }                     from 'react-native';
-import { useQuery } from '@apollo/client'
+import { useQuery, useMutation
+}                     from '@apollo/client'
+import _              from 'lodash'
 //
 import WordLists      from '../components/WordLists'
 import GuessInput     from '../components/GuessInput'
 import Ops            from '../graphql/Ops'
 import Bee            from '../lib/Bee'
+import DictSet        from '../lib/DictSet'
 
-class BeeScreenComp extends React.Component {
-  constructor(props) {
-    super(props)
-    const { bee } = props
-    this.state = {
-      guesses: bee.guesses,
-      gbs:     bee.guessesByScore(),
-      nogos:   bee.nogos,
-      bee,
-    }
-  }
+const BeeScreenComp = ({ bee }) => {
+  const [beePutMu] = useMutation(Ops.bee_put_mu)
 
-  render() {
-    const { bee, guesses, nogos, gbs } = this.state
-    return (
-      <SafeAreaView style={styles.container}>
-        <WordLists delGuess={this.delGuess} guesses={gbs} nogos={nogos} />
-        <GuessInput bee={bee} addToBee={this.addGuess} />
-        <View style={styles.guessBox}>
-          <Text>
-            {`Score: ${bee.totScore()} Words: ${guesses.length} ${JSON.stringify(bee.wordHist())}`}
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  addGuess = (word) => {
-    this.setState(({ bee }) => {
-      if (bee.hasWord(word)) { return ({}); }
-      bee.addGuess(word)
-      return ({
-        guesses: bee.guesses,
-        gbs:     bee.guessesByScore(),
-        nogos:   bee.nogos,
-      })
-    })
-  }
-
-  delGuess = (word) => {
-    this.setState(({ bee }) => {
-      bee.delGuess(word)
-      return ({
-        guesses: bee.guesses,
-        gbs:     bee.guessesByScore(),
-        nogos:   bee.nogos,
-      })
-    })
-  }
+  const delGuess = (word) => {
+    bee.delGuess(word)
+    beePutMu({ variables: bee.serialize() })
+  }    
+  
+  return (
+    <SafeAreaView style={styles.container}>
+      <WordLists delGuess={delGuess} guesses={bee.guessesByScore()} nogos={bee.nogos} />
+      <GuessInput bee={bee} />
+      <View style={styles.guessBox}>
+        <Text>
+          {`Sc: ${bee.totScore()} (${bee.guesses.length}): ${JSON.stringify(bee.wordHist())}`}
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
 }
 
 const renderError = (error) => {
@@ -85,10 +58,14 @@ const BeeScreen = ({ navigation, route }) => {
   //
   const bee = Bee.from(data.bee_get.bee)
   navigation.setOptions({ title: bee.dispLtrs })
-  console.log(data, bee)
+  // <Text>{JSON.stringify(data.bee_get.bee)}</Text>
+  const { grouped } = DictSet.allMatches(bee.letters)
   return (
-    <BeeScreenComp bee={bee} />
-  )
+    <View style={styles.container}>
+      <BeeScreenComp bee={bee} />
+      <Text>{JSON.stringify(_.fromPairs(_.map(grouped, (vv, kk) => [kk, vv.length ])))}</Text>
+    </View>
+      )
 }
 
 const styles = StyleSheet.create({
@@ -96,6 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems:      'center',
+    width: '100%',
   },
 });
 
