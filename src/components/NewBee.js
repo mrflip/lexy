@@ -19,26 +19,31 @@ const validationSchema = Yup.object().shape({
     .matches(/^([a-zA-Z][^a-zA-Z]*){7}$/, "Enter 7 letters"),
 })
 
-const addBeePlz = (addBeeMu, entry) => {
-  addBeeMu({ variables: { letters: entry } })
-}
-
 
 const NewBee = () => {
   const [entry, setEntry]  = useState('')
   const [addBeeMu] = useMutation(Ops.bee_put_mu, {
-    update: (cache, { data: { bee_put, ...restDat } }) => {
-      console.log('bp', bee_put, 'rest', restDat)
-      const { bee_list: { bees } } = cache.readQuery({ query: Ops.bee_list_qy })
-      console.log('bp', bees)
+    update: (cache, { data: { bee_put: { bee } } }) => {
+      const old_data = cache.readQuery({ query: Ops.bee_list_ids_qy })
+      const { bee_list: { bees } } = old_data
+      const new_bees = bees.concat([bee])
+      new_bees.sort((aa, bb) => ((aa.letters < bb.letters) ? -1 : 1))
+      const new_data = { ...old_data,
+        bee_list: { ...old_data.bee_list, bees: new_bees }
+      }
+      // console.log(new_data)
       cache.writeQuery({
-        query: Ops.bee_list_qy,
-        data:  { bee_list: { bees: bees.concat([bee_put.bee]) } },
+        query: Ops.bee_list_ids_qy,
+        data:  new_data,
       })
     },
   })
 
-  //
+  const addBeePlz = () => {
+    addBeeMu({ variables: { letters: entry } })
+    setEntry('')
+  }
+
   return (
     <View style={styles.container}>
       <Input
@@ -53,7 +58,7 @@ const NewBee = () => {
       <Button
         title            =" New Bee"
         icon             ={<Icon name="add-circle-outline" />}
-        onPress          ={() => { addBeePlz(addBeeMu, entry); setEntry('') }}
+        onPress          ={addBeePlz}
         style            ={styles.newBeeBtn}
       />
     </View>

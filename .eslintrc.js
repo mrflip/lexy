@@ -32,6 +32,7 @@ module.exports = {
     // "babel/semi":     "error",
     // "flowtype/delimiter-dangle": [ 2, "always-multiline" ],
     "airbnb/no-console":                      0,
+    "camelcase":                              0,
     "no-multi-spaces":                        0,
     "no-trailing-spaces":                     1,
     "quotes":                                 0,

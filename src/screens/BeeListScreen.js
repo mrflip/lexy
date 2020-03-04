@@ -3,19 +3,18 @@ import { StyleSheet, View, FlatList, SafeAreaView,
 }                   from 'react-native'
 import { Button, ListItem, Text,
 }                   from 'react-native-elements'
-import { useQuery } from '@apollo/client'
+import { useQuery, useMutation,
+}                   from '@apollo/client'
 //
 import Bee          from '../lib/Bee'
 import Ops          from '../graphql/Ops'
 import NewBee       from '../components/NewBee'
 
 const BeeListScreen = ({ navigation }) => {
-  const { loading, error, data, fetchMore } = useQuery(Ops.bee_list_qy);
+  const { loading, error, data, fetchMore } = useQuery(Ops.bee_list_ids_qy);
   if (loading) return <Text>Loading...</Text>;
   if (error)   return renderError(error);
   if (!data)   return <Text>No Data</Text>;
-  // const bees = data.bee_list.bees.map((obj) => Bee.from(obj))
-  // console.log(data, bees)
   return (
     <SafeAreaView style={styles.container}>
       <NewBee />
@@ -23,7 +22,7 @@ const BeeListScreen = ({ navigation }) => {
         style        ={styles.wordList}
         keyExtractor ={(letters, idx) => (letters+idx)}
         data         ={data.bee_list.bees}
-        renderItem   ={(info) => beeListItem({ ...info, navigation })}
+        renderItem   ={({item}) => <BeeListItem item={item} navigation={navigation} />}
       />
       <Button title="more" onPress={fetcher(data, fetchMore)} />
     </SafeAreaView>
@@ -44,18 +43,38 @@ const renderError = (error) => {
   );
 };
 
-const navToBee = (bee, event, navigation) => {
-  navigation.push("Bee", { title: bee.letters, letters: bee.letters })
-}
-
-const beeListItem = ({ item, navigation }) => {
+const BeeListItem = ({ item, navigation }) => {
   const bee = Bee.from(item)
+
+  const [delBeeMu] = useMutation(Ops.bee_del_mu, {
+    update: (cache, { data: { bee_del: { dead_bee } } }) => {
+      const old_data = cache.readQuery({ query: Ops.bee_list_ids_qy })
+      const { bee_list: { bees } } = old_data
+      const new_bees = bees.filter((bb) => (bb.letters !== bee.letters))
+      const new_data = {
+        ...old_data,
+        bee_list: { ...old_data.bee_list, bees: new_bees }
+      }
+      cache.writeQuery({
+        query: Ops.bee_list_ids_qy,
+        data:  new_data,
+      })
+    }
+  })
+  
+  const beeDelPlz = () => delBeeMu({ variables: { letters: bee.letters } })
+  
   return (
     <ListItem
       title={bee.dispLtrs}
       onPress={(event) => navToBee(bee, event, navigation)}
+      rightIcon={{ name: 'cancel', onPress: beeDelPlz, color: '#dcc' }}
     />
   )
+}
+
+const navToBee = (bee, event, navigation) => {
+  navigation.push("Bee", { title: bee.letters, letters: bee.letters })
 }
 
 const fetcher = (data, fetchMore) => (() => {

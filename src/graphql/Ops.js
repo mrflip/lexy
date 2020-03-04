@@ -30,10 +30,19 @@ const Ops = {
   ${Fragments.bee_frag}
   `,
 
+  bee_list_ids_qy: gql`
+  query bee_list_qy($cursor: String) {
+    bee_list(limit: 200, cursor: $cursor) {
+      bees { letters }
+      cursor
+    }
+  }
+  `,
+
   bee_put_mu: gql`
-  mutation bee_put_mu($letters: String!, $guesses: [String!]) {
+  mutation bee_put_mu($letters: String!, $guesses: [String!], $nogos: [String!]) {
     bee_put(
-      letters: $letters, guesses: $guesses, nogos: [],
+      letters: $letters, guesses: $guesses, nogos: $nogos,
     ) {
       success
       message
@@ -44,16 +53,15 @@ const Ops = {
   `,
 
   bee_del_mu: gql`
-  mutation bee_put_mu($letters: String!, $guesses: [String!]) {
-    bee_put(
-      letters: $letters, guesses: $guesses, nogos: [],
+  mutation bee_del_mu($letters: String!) {
+    bee_del(
+      letters: $letters
     ) {
       success
       message
-      bee { ...bee_frag }
+      bee { letters }
     }
   }
-  ${Fragments.bee_frag}
   `,
 }
 

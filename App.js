@@ -6,18 +6,19 @@ import * as Font               from 'expo-font'
 import { Ionicons }            from '@expo/vector-icons'
 import { NavigationContainer } from '@react-navigation/native'
 import {
-  ApolloProvider, ApolloClient, HttpLink, InMemoryCache,
+  ApolloProvider, ApolloClient, HttpLink, 
 }                              from '@apollo/client'
 //
 import AppNavigator            from './src/navigation/AppNavigator'
 import useLinking              from './src/navigation/useLinking'
 import { typeDefs, resolvers } from './src/graphql/resolvers'
+import Cache                   from './src/graphql/Cache'
 
 // Don't yell at me about other modules' error messages
 YellowBox.ignoreWarnings(['RootErrorBoundary'])
 
 const apollo = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: Cache,
   link: new HttpLink({
     // uri: Secrets.samwise.URL,
     uri: 'http://localhost:4000/graphql',
