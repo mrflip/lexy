@@ -55,7 +55,10 @@
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^2.4.0",
     "eslint-plugin-react-native": "^3.8.1",
+    "esm": "^3.2.25",
+    "glob": "^7.1.6",
     "jest-expo": "~36.0.1",
+    "jssoup": "^0.0.10",
     "react-native-debugger-open": "^0.3.24"
   },
   "private": true
