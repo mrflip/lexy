@@ -50,7 +50,7 @@ const BeeScreen = ({ navigation, route }) => {
   const { params = {} } = route
   const { letters } = params
   //
-  const { loading, error, data } = useQuery(Ops.bee_get_qy, { variables: { letters } });
+  const { loading, error, data } = useQuery(Ops.bee_get_qy, { variables: { letters }, pollInterval: 5000 });
   if (loading)               return <Text>Loading...</Text>;
   if (error)                 return renderError(error);
   if (!data)                 return <Text>No Data</Text>;
@@ -60,12 +60,13 @@ const BeeScreen = ({ navigation, route }) => {
   navigation.setOptions({ title: bee.dispLtrs })
   // <Text>{JSON.stringify(data.bee_get.bee)}</Text>
   const { grouped } = DictSet.allMatches(bee.letters)
+  console.log(bee.serialize().guesses)
   return (
     <View style={styles.container}>
       <BeeScreenComp bee={bee} />
       <Text>{JSON.stringify(_.fromPairs(_.map(grouped, (vv, kk) => [kk, vv.length ])))}</Text>
     </View>
-      )
+  )
 }
 
 const styles = StyleSheet.create({

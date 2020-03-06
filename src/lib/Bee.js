@@ -49,7 +49,8 @@ class Bee {
 
   hasWord = (word) => (
     this.guesses.some((guess) => (guess.word === word))
-    || this.nogos.some((guess)  => (guess.word === word)))
+    || this.nogos.some((guess)  => (guess.word === word))
+  )
 
   normEntry = (text) => (
     text.toLowerCase().replace(this.rejectRe, '')
@@ -65,7 +66,8 @@ class Bee {
       .value()
   )
 
-  addGuess(word) {
+  addGuess(wd) {
+    const word = wd.toLowerCase()
     if (this.hasWord(word)) return;
     const guess = new Guess(word, this)
     if (guess.nogo) {

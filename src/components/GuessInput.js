@@ -15,6 +15,7 @@ const LetterButton = ({ letter, handler }) => (
     title={letter}
     onPress={() => handler(letter)}
     style={styles.letterButton}
+    titleStyle={styles.letterButtonText}
   />
 )
 
@@ -32,6 +33,7 @@ const GuessInput = ({ bee, addToBee }) => {
   const addGuess = () => {
     if (bee.hasWord(entry)) { clearEntry(); return }
     bee.addGuess(entry)
+    console.log('added', entry, bee.guesses)
     beePutMu({ variables: bee.serialize() })
     clearEntry()
   }
@@ -40,6 +42,7 @@ const GuessInput = ({ bee, addToBee }) => {
     <View style={styles.container}>
       <Input
         style={[styles.entryText]}
+        inputStyle={styles.entryText}
         autoCapitalize  = "none"
         autoCorrect     = {false}
         autoCompleteType = "off"
@@ -62,6 +65,7 @@ const GuessInput = ({ bee, addToBee }) => {
           bee.larry.map((ltr) => (
             <LetterButton key={ltr} letter={ltr} handler={addLetter} />))
         }
+        <Icon name="backspace" iconStyle={styles.letterButton} onPress={delLetter} />
       </View>
     </View>
   )
@@ -78,7 +82,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   entryText: {
-    fontSize:       20,
+    fontSize:       24,
     flex:           4,
   },
   entryIcon: {
@@ -88,12 +92,17 @@ const styles = StyleSheet.create({
   letterButton: {
     padding:        5,
     margin:         5,
-    width:          Layout.window.width / 9,
+    width:          Layout.window.width / 8,
+    fontSize:       34,
+  },
+  letterButtonText: {
+    fontSize:       28,
   },
   buttonRow: {
     flexDirection:  'row',
     justifyContent: 'space-around',
-    width:          '80%',
+    width:          '94%',
+    alignItems:     'center',
   },
 })
 

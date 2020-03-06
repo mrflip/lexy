@@ -14,7 +14,7 @@ DictSet.allMatches = (letters) => {
   const grouped = _.groupBy(words, 'length')
   const matches = { words, grouped }
   Searches[letters] = matches
-  console.log(Searches)
+  // console.log(Searches)
   return matches
 }
 

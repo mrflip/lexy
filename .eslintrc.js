@@ -54,6 +54,7 @@ module.exports = {
     "react/state-in-constructor":             0,
     "jsx-a11y/accessible-emoji":              0,
     "padded-blocks":                          0,
+    "no-unused-vars":                         ["warn", { "varsIgnorePattern": "^_", argsIgnorePattern: "^_", }],
     "react/prop-types": 0,
     "react/sort-comp": [1, {
       order: [

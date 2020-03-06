@@ -6,13 +6,14 @@ import * as Font               from 'expo-font'
 import { Ionicons }            from '@expo/vector-icons'
 import { NavigationContainer } from '@react-navigation/native'
 import {
-  ApolloProvider, ApolloClient, HttpLink, 
+  ApolloProvider, ApolloClient, HttpLink,
 }                              from '@apollo/client'
 //
 import AppNavigator            from './src/navigation/AppNavigator'
 import useLinking              from './src/navigation/useLinking'
 import { typeDefs, resolvers } from './src/graphql/resolvers'
 import Cache                   from './src/graphql/Cache'
+import Secrets                 from './Secrets'
 
 // Don't yell at me about other modules' error messages
 YellowBox.ignoreWarnings(['RootErrorBoundary'])
@@ -20,8 +21,8 @@ YellowBox.ignoreWarnings(['RootErrorBoundary'])
 const apollo = new ApolloClient({
   cache: Cache,
   link: new HttpLink({
-    // uri: Secrets.samwise.URL,
-    uri: 'http://localhost:4000/graphql',
+    uri: Secrets.graphql_api,
+    // uri: 'http://localhost:4000/graphql',
   }),
   typeDefs,
   resolvers,
