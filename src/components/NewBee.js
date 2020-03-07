@@ -10,6 +10,7 @@ import * as Yup            from 'yup'
 //
 import Bee                 from '../lib/Bee'
 import Ops                 from '../graphql/Ops'
+import AllBees             from '../../data/bees.json'
 
 const validationSchema = Yup.object().shape({
   letters: Yup
@@ -29,15 +30,18 @@ const NewBee = () => {
       const new_bees = bees.concat([bee])
       new_bees.sort((aa, bb) => ((aa.letters < bb.letters) ? -1 : 1))
       const new_data = { ...old_data,
-        bee_list: { ...old_data.bee_list, bees: new_bees }
+                         bee_list: { ...old_data.bee_list, bees: new_bees }
       }
-      console.log(new_data)
+      // console.log(new_data)
       cache.writeQuery({
         query: Ops.bee_list_ids_qy,
         data:  new_data,
       })
     },
   })
+
+  // abusive bulk import
+  // AllBees.forEach((ltrs) => (addBeeMu({ variables: { letters: ltrs } })))
 
   const addBeePlz = () => {
     addBeeMu({ variables: { letters: entry } })
@@ -54,6 +58,7 @@ const NewBee = () => {
         autoCorrect      = {false}
         autoCompleteType = "off"
         onChangeText     ={(text) => setEntry(Bee.normalize(text).toUpperCase())}
+        onSubmitEditing ={addBeePlz}
       />
       <Button
         title            =" New Bee"

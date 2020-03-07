@@ -8,7 +8,8 @@ const validStyle = (guess) => {
   if (!guess.valid)  return styles.entryBad
   if (guess.nogo)    return styles.nogo
   if (guess.isPan)   return styles.entryPangram
-  return styles.entryValid
+  if (guess.nyt)     return styles.entryValid
+  return styles.entryOther
 }
 
 const guessItem = ({ item, delGuess }) => {
@@ -100,6 +101,9 @@ const styles = StyleSheet.create({
   },
   entryValid: {
     backgroundColor: '#cceecc',
+  },
+  entryOther: {
+    backgroundColor: '#eee',
   },
   entryBad: {
     backgroundColor: '#eecccc',

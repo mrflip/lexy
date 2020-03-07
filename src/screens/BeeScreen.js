@@ -1,7 +1,7 @@
 import * as React     from 'react';
 import { StyleSheet, Text, View, SafeAreaView,
 }                     from 'react-native';
-import { useQuery, useMutation
+import { useQuery, useMutation,
 }                     from '@apollo/client'
 import _              from 'lodash'
 //
@@ -9,7 +9,7 @@ import WordLists      from '../components/WordLists'
 import GuessInput     from '../components/GuessInput'
 import Ops            from '../graphql/Ops'
 import Bee            from '../lib/Bee'
-import DictSet        from '../lib/DictSet'
+import { Dicts }      from '../lib/Dicts'
 
 const BeeScreenComp = ({ bee }) => {
   const [beePutMu] = useMutation(Ops.bee_put_mu)
@@ -17,7 +17,7 @@ const BeeScreenComp = ({ bee }) => {
   const delGuess = (word) => {
     bee.delGuess(word)
     beePutMu({ variables: bee.serialize() })
-  }    
+  }
   
   return (
     <SafeAreaView style={styles.container}>
@@ -25,7 +25,10 @@ const BeeScreenComp = ({ bee }) => {
       <GuessInput bee={bee} />
       <View style={styles.guessBox}>
         <Text>
-          {`Sc: ${bee.totScore()} (${bee.guesses.length}): ${JSON.stringify(bee.wordHist())}`}
+          {bee.summary('scr')}
+        </Text>
+        <Text>
+          {bee.summary('nyt')}
         </Text>
       </View>
     </SafeAreaView>
@@ -33,7 +36,7 @@ const BeeScreenComp = ({ bee }) => {
 }
 
 const renderError = (error) => {
-  console.log("Error in ListBees", JSON.stringify(error));
+  // console.log("Error in ListBees", JSON.stringify(error));
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -50,7 +53,8 @@ const BeeScreen = ({ navigation, route }) => {
   const { params = {} } = route
   const { letters } = params
   //
-  const { loading, error, data } = useQuery(Ops.bee_get_qy, { variables: { letters }, pollInterval: 5000 });
+  const { loading, error, data } = useQuery(Ops.bee_get_qy, {
+    variables: { letters }, pollInterval: 5000 });
   if (loading)               return <Text>Loading...</Text>;
   if (error)                 return renderError(error);
   if (!data)                 return <Text>No Data</Text>;
@@ -58,13 +62,10 @@ const BeeScreen = ({ navigation, route }) => {
   //
   const bee = Bee.from(data.bee_get.bee)
   navigation.setOptions({ title: bee.dispLtrs })
-  // <Text>{JSON.stringify(data.bee_get.bee)}</Text>
-  const { grouped } = DictSet.allMatches(bee.letters)
-  console.log(bee.serialize().guesses)
+  // console.log(bee.serialize().guesses)
   return (
     <View style={styles.container}>
       <BeeScreenComp bee={bee} />
-      <Text>{JSON.stringify(_.fromPairs(_.map(grouped, (vv, kk) => [kk, vv.length ])))}</Text>
     </View>
   )
 }

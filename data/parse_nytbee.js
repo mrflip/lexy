@@ -5,12 +5,10 @@ import _        from 'lodash'
 import glob     from 'glob'
 //
 import Bee      from '../src/lib/Bee'
-import Scrabble from './wl_us.json'
 
 // --- Setup
 // wget -r -l100000 --no-clobber -nv https://nytbee.com/
 const data_dir = '/data/ripd/nytbee.com'
-const dict_fn  = './data/dicts.js'
 
 // --- Parse
 const AllWords = new Set()
@@ -54,16 +52,14 @@ glob(`${data_dir}/Bee_*.html`, (err, files) => {
   const all_obs = Array.from(AllObs.values()).sort()
   // console.log(all_wds)
 
-  const dicts_prog = `
-const NytDict = new Set(${JSON.stringify(all_wds)})
-const ObsDict = new Set(${JSON.stringify(all_obs)})
-const ScrDict = new Set(${JSON.stringify(Scrabble)})
+  const all_ltrs = AllBees.map((bb)=>bb.letters)
+  all_ltrs.sort()
+  
+  fs.writeFileSync('./data/dict_nyt.json', JSON.stringify(all_wds), { encoding: 'utf8' });
+  fs.writeFileSync('./data/dict_obs.json', JSON.stringify(all_obs), { encoding: 'utf8' });
+  fs.writeFileSync('./data/bees.json',     JSON.stringify(all_ltrs), { encoding: 'utf8' });
 
-const Dicts = { nyt: NytDict, obs: ObsDict, scr: ScrDict }
-export default Dicts
-`;
-
-  fs.writeFileSync(dict_fn, dicts_prog, { encoding: 'utf8' });
+  console.log(all_ltrs.length)
 
   // import Dicts from './dicts'
   // console.log(Dicts)

@@ -1,16 +1,18 @@
-import _     from 'lodash'
-import Guess from './Guess'
+import _                from 'lodash'
+import Guess            from './Guess'
+import { Dicts }        from './Dicts'
 
 const VOWELS = new Set(['a', 'e', 'i', 'o', 'u'])
 
 class Bee {
   constructor(ltrs) {
-    this.letters    = Bee.normalize(ltrs)
-    this.mainLetter = this.letters[0]  //eslint-disable-line
-    this.pangramRe  = Bee.makePangramRe(this.letters)
+    this.letters     = Bee.normalize(ltrs)
+    this.mainLetter  = this.letters[0]  //eslint-disable-line
+    this.pangramRe   = Bee.makePangramRe(this.letters)
     this.rejectRe     = Bee.makeRejectRe(this.letters)
-    this.guesses    = []
-    this.nogos      = []
+    this.guesses     = []
+    this.nogos       = []
+    this._lexMatches = {}
   }
 
   static normalize(ltrs) {
@@ -56,15 +58,17 @@ class Bee {
     text.toLowerCase().replace(this.rejectRe, '')
   )
 
-  guessesByScore = () => (
-    _(this.guesses)
+  guessesByScore = () => {
+    const { nums:nyt_nums } = this.lexMatches('nyt')
+    const { nums:scr_nums } = this.lexMatches('scr')
+    return _(this.guesses)
       .groupBy('len')
       .map((gs, len) => ({
-        title: `${len}-letter (${gs.length})`,
+        title: `${len}s (${gs.length}/${scr_nums[len]} | ${gs.filter((gg) => gg.nyt).length}/${nyt_nums[len]})`,
         data: gs,
       }))
       .value()
-  )
+  }
 
   addGuess(wd) {
     const word = wd.toLowerCase()
@@ -92,19 +96,39 @@ class Bee {
     return (aa.score < bb.score ? -1 : Bee.byAlpha(aa, bb))
   }
 
-  wordHist() {
-    return this.guesses.reduce((hist, guess) => {
-      if (guess.valid) {
-        hist[guess.len] = 1 + (hist[guess.len] || 0)
+  lexMatches = (lex) => {
+    if (!this._lexMatches[lex]) { 
+      this._lexMatches[lex] = Dicts.lexMatches(lex, this.letters.toLowerCase())
+    }
+    return this._lexMatches[lex]
+  }
+
+  summary(lex) {
+    const { grouped, topScore, num } = this.lexMatches(lex)
+    const beeHist = this.wordHist(lex)
+    const totHist = Object
+      .entries(grouped)
+      .map(([kk, vv]) => [kk, vv.length])
+      .map(([kk, vv]) => `${kk}:${beeHist[kk]}/${vv}`)
+      .join(' ')
+    return `${this.totScore()}/${topScore} (${this.guesses.length}/${num}): ${totHist}`
+  }
+
+  wordHist(lex) {
+    const hist = {}
+    _.range(0, 15).forEach((nn) => (hist[nn] = 0))
+    this.guesses.forEach((guess) => {
+      if (guess[lex]) {
+        hist[guess.len] = 1 + hist[guess.len]
       }
-      return hist
-    }, {})
+    })
+    return hist
   }
 
   totScore() {
     return this.guesses.reduce((tot, guess) => (tot + guess.score), 0)
   }
-
+  
   serialize() {
     return {
       letters: this.letters,
