@@ -7,7 +7,7 @@ import glob     from 'glob'
 import Bee      from '../src/lib/Bee'
 
 // --- Setup
-// wget -r -l100000 --no-clobber -nv https://nytbee.com/
+// cd /data/ripd; wget -r -l100000 --no-clobber -nv https://nytbee.com/Bee_`date +"%Y%m%d"`.html
 const data_dir = '/data/ripd/nytbee.com'
 
 // --- Parse
@@ -23,6 +23,9 @@ glob(`${data_dir}/Bee_*.html`, (err, files) => {
     const [wds_els, _skip, obs_els] = doc.findAll('div').filter((div) => div.attrs.class === 'answer-list')
 
     const words = {}
+
+    words.datestr = filename.replace(/.*Bee_/, '').replace(/\.html/, '')
+
     words.wds     = wds_els.text.split(/\s+/).filter((ss) => (ss.length > 0))
     words.obs     = obs_els.findAll('li').map((li) => li.text)
     // words.datestr = datestr
@@ -52,8 +55,8 @@ glob(`${data_dir}/Bee_*.html`, (err, files) => {
   const all_obs = Array.from(AllObs.values()).sort()
   // console.log(all_wds)
 
-  const all_ltrs = AllBees.map((bb)=>bb.letters)
-  all_ltrs.sort()
+  const all_ltrs = AllBees.map((bb)=> [bb.letters.toUpperCase(), bb.datestr])
+  all_ltrs.sort(([wa,da], [wb, db]) => (da < db ? 1 : -1))
   
   fs.writeFileSync('./data/dict_nyt.json', JSON.stringify(all_wds), { encoding: 'utf8' });
   fs.writeFileSync('./data/dict_obs.json', JSON.stringify(all_obs), { encoding: 'utf8' });

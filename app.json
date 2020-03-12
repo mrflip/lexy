@@ -4,29 +4,34 @@
     "slug": "lexy",
     "privacy": "public",
     "sdkVersion": "36.0.0",
+    "version": "1.0.0",
     "platforms": [
       "ios",
       "android",
       "web"
     ],
-    "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/LexyIcon.png",
+    "scheme": "lexy",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/Splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#fbf3e0"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mrflip.lexy",
+      "buildNumber": "0.0.1",
+      "requireFullScreen": false
     },
-    "description": ""
+    "primaryColor": "#fbf3e0",
+    "description": "Search words and definitions"
   }
 }

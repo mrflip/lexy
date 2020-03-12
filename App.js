@@ -65,12 +65,9 @@ export default function App(props) {
   } else {
     return (
       <ApolloProvider client={apollo}>
-        <View style={styles.container}>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-            <AppNavigator />
-          </NavigationContainer>
-        </View>
+        <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
+          <AppNavigator />
+        </NavigationContainer>
       </ApolloProvider>
     );
   }

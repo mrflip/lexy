@@ -10,6 +10,8 @@ import Bee          from '../lib/Bee'
 import Ops          from '../graphql/Ops'
 import NewBee       from '../components/NewBee'
 
+import AllBees             from '../../data/bees.json'
+
 const BeeListScreen = ({ navigation }) => {
   const { loading, error, data, fetchMore } = useQuery(Ops.bee_list_ids_qy);
   if (loading) return <Text>Loading...</Text>;
@@ -55,7 +57,7 @@ const BeeListItem = ({ item, navigation }) => {
         ...old_data,
         bee_list: { ...old_data.bee_list, bees: new_bees }
       }
-      console.log(new_data)
+      // console.log(new_data)
       cache.writeQuery({
         query: Ops.bee_list_ids_qy,
         data:  new_data,
@@ -64,6 +66,8 @@ const BeeListItem = ({ item, navigation }) => {
   })
   
   const beeDelPlz = () => beeDelMu({ variables: { letters: bee.letters } })
+
+  // AllBees.forEach((letters) => (beeDelMu({ variables: { letters } })))
   
   return (
     <ListItem

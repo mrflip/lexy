@@ -3,10 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
-import HeaderedScreen from '../components/HeaderedScreen'
 
-const LinksScreen = () => (
-  <HeaderedScreen title="About">
+const AboutScreen = () => (
+  <SafeAreaView title="About">
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <OptionButton
         icon="md-school"
@@ -27,23 +26,8 @@ const LinksScreen = () => (
         isLastOption
       />
     </ScrollView>
-  </HeaderedScreen>
+  </SafeAreaView>
 )
-
-function OptionButton({ icon, label, onPress, isLastOption }) {
-  return (
-    <RectButton style={[styles.option, isLastOption && styles.lastOption]} onPress={onPress}>
-      <View style={styles.row}>
-        <View style={styles.optionIconContainer}>
-          <Ionicons name={icon} size={22} color="rgba(0,0,0,0.35)" />
-        </View>
-        <View style={styles.optionTextContainer}>
-          <Text style={styles.optionText}>{label}</Text>
-        </View>
-      </View>
-    </RectButton>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
